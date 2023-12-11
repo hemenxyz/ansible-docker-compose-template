@@ -4,7 +4,7 @@
   become: yes
 
   vars:
-    git_repo: "https://github.com/username/appx.git"  # Replace with your Git repository URL
+    git_repo: "https://github.com/MHSanaei/3x-ui"  # Replace with your Git repository URL
     repo_dest: "/appx"  # Destination path on the remote server
     docker_compose_file: "docker-compose.yml"  # Docker Compose file name
 
@@ -21,7 +21,6 @@
           - python3
           - python3-pip
         update_cache: yes
-      when: ansible_facts.packages['docker-ce'] is not defined
 
     - name: Add Docker’s official GPG key
       apt_key:
