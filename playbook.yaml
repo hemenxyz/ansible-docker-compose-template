@@ -1,0 +1,30 @@
+---
+- name: Clone Repository and Run Docker Compose
+  hosts: all
+  become: yes
+
+  vars:
+    git_repo: "https://github.com/username/appx.git"  # Replace with your Git repository URL
+    repo_dest: "/appx"  # Destination path on the remote server
+    docker_compose_file: "docker-compose.yml"  # Docker Compose file name
+
+  tasks:
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+      when: ansible_facts.packages['git'] is not defined
+
+    - name: Clone Git repository
+      git:
+        repo: "{{ git_repo }}"
+        dest: "{{ repo_dest }}"
+        clone: yes
+        update: yes
+
+    - name: Run Docker Compose
+      command:
+        cmd: docker-compose up -d
+        chdir: "{{ repo_dest }}"
+      environment:
+        DOCKER_COMPOSE_FILE: "{{ docker_compose_file }}"
