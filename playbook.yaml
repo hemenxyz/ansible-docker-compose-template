@@ -1,5 +1,5 @@
 ---
-- name: Clone Repository and Run Docker Compose
+- name: Install and Configure Nextcloud using Docker
   hosts: all
   become: yes
 
@@ -8,12 +8,46 @@
     repo_dest: "/appx"  # Destination path on the remote server
     docker_compose_file: "docker-compose.yml"  # Docker Compose file name
 
+
   tasks:
+    - name: Install general prerequisites
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+          - python3
+          - python3-pip
+        update_cache: yes
+      when: ansible_facts.packages['docker-ce'] is not defined
+
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+
+    - name: Install Docker Engine
+      apt:
+        name: docker-ce
+        update_cache: yes
+        state: latest
+
+    - name: Ensure Python Docker SDK is installed
+      pip:
+        name: docker
+        state: present
+
     - name: Install Git
       apt:
         name: git
         state: present
-      when: ansible_facts.packages['git'] is not defined
 
     - name: Clone Git repository
       git:
